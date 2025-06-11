@@ -10,12 +10,8 @@ local UserInputService = game:GetService("UserInputService")
 -- Protected players
 local protectedPlayers = {
     "coco_w12345",
-    "iLove_Myselfff00", 
-    "Bashayer305m",
-    "ghazal2888",
-    "rto_357",
-    "HOOR_7862",
-    "1bed00"
+    "00000",
+    "00000"
 }
 
 -- Create main GUI
