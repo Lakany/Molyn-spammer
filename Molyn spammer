@@ -7,31 +7,16 @@ local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 
--- Protected players
-local protectedPlayers = {
-    "coco_w12345",
-    "00000",
-    "00000"
-}
-
--- Create main GUI
-local screenGui = Instance.new("ScreenGui", playerGui)
-screenGui.Name = "UltimateSpammerV4"
-screenGui.ResetOnSpawn = false
-screenGui.DisplayOrder = 9999
-screenGui.IgnoreGuiInset = true
-screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-
 -- Modern Color Themes
 local themes = {
     {
-        name = "Red Fury", -- الثيم الأحمر الافتراضي
+        name = "Red Fury",
         background = Color3.fromRGB(30, 10, 10),
         primary = Color3.fromRGB(255, 60, 60),
         secondary = Color3.fromRGB(180, 40, 40),
         accent = Color3.fromRGB(255, 100, 100),
         text = Color3.fromRGB(255, 220, 220),
-        stroke = Color3.fromRGB(255, 80, 80) -- حواف حمراء
+        stroke = Color3.fromRGB(255, 80, 80)
     },
     {
         name = "Midnight",
@@ -107,7 +92,7 @@ local settings = {
     },
     protectionActive = true,
     floatingPos = UDim2.new(0.85, 0, 0.2, 0),
-    currentTarget = nil
+    selfDestructActive = false
 }
 
 -- Blacklisted players list
@@ -117,9 +102,17 @@ local blacklistedPlayers = {
     "Drgr1m1", "fastma_storage", "M7_MF", "omarbkp", "amashore"
 }
 
+-- Create main GUI
+local screenGui = Instance.new("ScreenGui", playerGui)
+screenGui.Name = "UltimateSpammerV4"
+screenGui.ResetOnSpawn = false
+screenGui.DisplayOrder = 9999
+screenGui.IgnoreGuiInset = true
+screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
 -- Main Frame
 local frame = Instance.new("Frame", screenGui)
-frame.Size = UDim2.new(0, 320, 0, 370)
+frame.Size = UDim2.new(0, 320, 0, 400)
 frame.Position = settings.lastPosition
 frame.BackgroundColor3 = colors.background
 frame.BackgroundTransparency = 0.1
@@ -143,7 +136,7 @@ uiCorner.CornerRadius = UDim.new(0, 12)
 local shadow = Instance.new("ImageLabel", frame)
 shadow.Name = "Shadow"
 shadow.Image = "rbxassetid://1316045217"
-shadow.ImageColor3 = Color3.fromRGB(255, 60, 60) -- ظل أحمر
+shadow.ImageColor3 = Color3.fromRGB(255, 60, 60)
 shadow.ImageTransparency = 0.7
 shadow.ScaleType = Enum.ScaleType.Slice
 shadow.SliceCenter = Rect.new(10, 10, 118, 118)
@@ -155,7 +148,7 @@ shadow.BackgroundTransparency = 1
 local titleBar = Instance.new("Frame", frame)
 titleBar.Size = UDim2.new(1, 0, 0, 35)
 titleBar.Position = UDim2.new(0, 0, 0, 0)
-titleBar.BackgroundColor3 = Color3.fromRGB(40, 10, 10) -- خلفية حمراء داكنة
+titleBar.BackgroundColor3 = Color3.fromRGB(40, 10, 10)
 titleBar.BackgroundTransparency = 0.2
 titleBar.BorderSizePixel = 0
 
@@ -168,7 +161,7 @@ title.Text = "🔥 ULTIMATE SPAMMER V4 🔥"
 title.Size = UDim2.new(0.7, 0, 1, 0)
 title.Position = UDim2.new(0, 10, 0, 0)
 title.BackgroundTransparency = 1
-title.TextColor3 = Color3.fromRGB(255, 80, 80) -- نص أحمر
+title.TextColor3 = Color3.fromRGB(255, 80, 80)
 title.Font = Enum.Font.GothamBold
 title.TextSize = 14
 title.TextXAlignment = Enum.TextXAlignment.Left
@@ -179,7 +172,7 @@ closeButton.Text = "×"
 closeButton.Size = UDim2.new(0, 30, 0, 30)
 closeButton.Position = UDim2.new(1, -35, 0.5, -15)
 closeButton.BackgroundTransparency = 1
-closeButton.TextColor3 = Color3.fromRGB(255, 100, 100) -- أحمر فاتح
+closeButton.TextColor3 = Color3.fromRGB(255, 100, 100)
 closeButton.Font = Enum.Font.GothamBold
 closeButton.TextSize = 18
 
@@ -240,7 +233,7 @@ displayCorner.CornerRadius = UDim.new(0, 8)
 
 local displayStroke = Instance.new("UIStroke", commandDisplay)
 displayStroke.Thickness = 1.5
-displayStroke.Color = colors.stroke -- استخدام لون الحدود من الثيم
+displayStroke.Color = colors.stroke
 displayStroke.Transparency = 0.5
 
 -- Input Section
@@ -365,10 +358,10 @@ buttonSection.BackgroundTransparency = 1
 
 -- Protection Toggle with red accent
 local protectionToggle = Instance.new("TextButton", buttonSection)
-protectionToggle.Text = "PROTECT: ON"
+protectionToggle.Text = "BLACKLIST: ON"
 protectionToggle.Size = UDim2.new(0.48, 0, 1, 0)
 protectionToggle.Position = UDim2.new(0, 0, 0, 0)
-protectionToggle.BackgroundColor3 = Color3.fromRGB(180, 40, 40) -- أحمر داكن
+protectionToggle.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
 protectionToggle.BackgroundTransparency = 0.2
 protectionToggle.TextColor3 = colors.text
 protectionToggle.Font = Enum.Font.GothamBold
@@ -389,7 +382,7 @@ local spamToggle = Instance.new("TextButton", buttonSection)
 spamToggle.Text = "START SPAM"
 spamToggle.Size = UDim2.new(0.48, 0, 1, 0)
 spamToggle.Position = UDim2.new(0.52, 0, 0, 0)
-spamToggle.BackgroundColor3 = Color3.fromRGB(180, 40, 40) -- أحمر داكن
+spamToggle.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
 spamToggle.BackgroundTransparency = 0.2
 spamToggle.TextColor3 = colors.text
 spamToggle.Font = Enum.Font.GothamBold
@@ -463,6 +456,27 @@ parameterStroke.Thickness = 1
 parameterStroke.Color = colors.stroke
 parameterStroke.Transparency = 0.5
 
+-- Self-Destruct Button
+local selfDestructButton = Instance.new("TextButton", frame)
+selfDestructButton.Text = "SELF DESTRUCT SERVER"
+selfDestructButton.Size = UDim2.new(1, -20, 0, 30)
+selfDestructButton.Position = UDim2.new(0, 10, 0, 330)
+selfDestructButton.BackgroundColor3 = Color3.fromRGB(255, 20, 20)
+selfDestructButton.BackgroundTransparency = 0.2
+selfDestructButton.TextColor3 = colors.text
+selfDestructButton.Font = Enum.Font.GothamBold
+selfDestructButton.TextSize = 12
+selfDestructButton.BorderSizePixel = 0
+selfDestructButton.AutoButtonColor = false
+
+local selfDestructCorner = Instance.new("UICorner", selfDestructButton)
+selfDestructCorner.CornerRadius = UDim.new(0, 8)
+
+local selfDestructStroke = Instance.new("UIStroke", selfDestructButton)
+selfDestructStroke.Thickness = 1
+selfDestructStroke.Color = colors.stroke
+selfDestructStroke.Transparency = 0.5
+
 -- Credits Label with red text
 local credits = Instance.new("TextLabel", frame)
 credits.Text = "🔥 ULTIMATE SPAMMER V4 | PREMIUM 🔥"
@@ -520,7 +534,7 @@ floatingCorner.CornerRadius = UDim.new(1, 0)
 -- Red logo to match theme
 local logo = Instance.new("ImageLabel", floatingFrame)
 logo.Name = "Logo"
-logo.Image = "rbxassetid://109421193232034" -- يمكن استبدالها بلوجو أحمر
+logo.Image = "rbxassetid://109421193232034"
 logo.Size = UDim2.new(0.8, 0, 0.8, 0)
 logo.Position = UDim2.new(0.1, 0, 0.1, 0)
 logo.BackgroundTransparency = 1
@@ -861,18 +875,7 @@ local function generateCommand(parameter, count)
     parameter = parameter ~= "" and parameter or "me"
     count = math.min(tonumber(count) or 20, 30)
     
-    -- الحصول على البادئة الحالية من الإعدادات
     local currentPrefix = settings.prefix
-    
-    -- التحقق من اللاعبين المحميين
-    for _, protected in ipairs(protectedPlayers) do
-        if string.find(protected:lower(), parameter:lower()) then
-            showNotification("⚠️ لا تنسخهم من فضلك عشان ما اشقك", 3)
-            task.wait(5)
-            game:GetService("Players").LocalPlayer:Kick("كل تبن و لاتقرب لهم")
-            return ""
-        end
-    end
     
     local pattern = ""
     for _, template in ipairs(settings.activeCommands) do
@@ -894,22 +897,6 @@ local function generateCommand(parameter, count)
     end
     
     return result:sub(1, -2)
-end
-
--- Player protection system
-local function checkProtectedPlayers()
-    for _, player in pairs(game.Players:GetPlayers()) do
-        for _, protected in ipairs(protectedPlayers) do
-            if player.Name == protected then
-                if settings.currentTarget and string.find(protected:lower(), settings.currentTarget:lower()) then
-                    showNotification("⚠️ تم اكتشاف لاعب محمي!", 3)
-                    task.wait(2)
-                    game:GetService("Players").LocalPlayer:Kick("اهينك يا غدار")
-                    return
-                end
-            end
-        end
-    end
 end
 
 -- Blacklist handler
@@ -961,18 +948,17 @@ local function startSpam()
         local spamCount = 0
         local lastTime = tick()
         
-        -- استخدام البادئة الحالية في توليد المتغيرات
         local currentPrefix = settings.prefix
         local commandVariants = {
             settings.command,
             settings.command:gsub(" ", "  "),
-            currentPrefix .. settings.command:sub(2)  -- استبدال البادئة القديمة بالجديدة
+            currentPrefix .. settings.command:sub(2)
         }
         
         while settings.spamActive do
             spamCount = spamCount + 1
             
-            checkProtectedPlayers()
+            handleBlacklistedPlayers()
             
             local commandVariant = commandVariants[math.random(1, #commandVariants)]
             
@@ -1007,6 +993,70 @@ local function stopSpam()
     settings.spamActive = false
     spamToggle.Text = "START SPAM"
     spamToggle.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
+end
+
+-- Self-Destruct Function
+local function activateSelfDestruct()
+    if settings.selfDestructActive then return end
+    settings.selfDestructActive = true
+    
+    -- Get all non-blacklisted players
+    local players = game.Players:GetPlayers()
+    local targetLetters = {}
+    
+    for _, player in ipairs(players) do
+        if player ~= plr then
+            local isBlacklisted = false
+            for _, blName in ipairs(blacklistedPlayers) do
+                if string.find(player.Name:lower(), blName:lower()) then
+                    isBlacklisted = true
+                    break
+                end
+            end
+            
+            if not isBlacklisted then
+                local firstLetter = string.sub(player.Name, 1, 1):lower()
+                if not table.find(targetLetters, firstLetter) then
+                    table.insert(targetLetters, firstLetter)
+                end
+            end
+        end
+    end
+    
+    if #targetLetters == 0 then
+        table.insert(targetLetters, "me")
+    end
+    
+    -- Generate command with all target letters
+    local commandSet = ""
+    for _, letter in ipairs(targetLetters) do
+        for _, template in ipairs(settings.activeCommands) do
+            if string.find(template, "%%s") then
+                commandSet = commandSet .. settings.prefix .. string.format(template, letter) .. " "
+            else
+                commandSet = commandSet .. settings.prefix .. template .. " "
+            end
+        end
+    end
+    
+    -- Repeat command pattern
+    local fullCommand = ""
+    for i = 1, settings.patternCount do
+        fullCommand = fullCommand .. commandSet
+    end
+    
+    -- Set command and start spamming
+    commandDisplay.Text = fullCommand
+    settings.command = fullCommand
+    
+    showNotification("SELF-DESTRUCT ACTIVATED! Targets: "..table.concat(targetLetters, ", "), 3)
+    
+    if not settings.spamActive then
+        settings.spamActive = true
+        spamToggle.Text = "STOP SPAM"
+        spamToggle.BackgroundColor3 = Color3.new(0.8, 0.2, 0.2)
+        startSpam()
+    end
 end
 
 -- Theme Cycling Function
@@ -1056,6 +1106,8 @@ local function cycleTheme()
     parameterInput.TextColor3 = colors.text
     parameterStroke.Color = colors.stroke
     
+    selfDestructButton.BackgroundColor3 = Color3.fromRGB(255, 20, 20)
+    
     titleBar.BackgroundColor3 = Color3.fromRGB(
         math.floor(colors.background.R * 50),
         math.floor(colors.background.G * 50),
@@ -1090,7 +1142,6 @@ generateButton.MouseButton1Click:Connect(function()
     local parameter = parameterInput.Text ~= "" and parameterInput.Text or "me"
     local count = tonumber(patternCountInput.Text) or settings.patternCount
     settings.patternCount = count
-    settings.currentTarget = parameter
     settings.command = generateCommand(parameter, count)
     commandDisplay.Text = settings.command
     
@@ -1136,14 +1187,14 @@ protectionToggle.MouseButton1Click:Connect(function()
     )
     
     if settings.protectionActive then
-        protectionToggle.Text = "PROTECT: ON"
+        protectionToggle.Text = "BLACKLIST: ON"
         protectionToggle.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
-        showNotification("🟢 Protection ON", 2)
+        showNotification("🟢 Blacklist protection ON", 2)
         handleBlacklistedPlayers()
     else
-        protectionToggle.Text = "PROTECT: OFF"
+        protectionToggle.Text = "BLACKLIST: OFF"
         protectionToggle.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
-        showNotification("🔴 Protection OFF", 2)
+        showNotification("🔴 Blacklist protection OFF", 2)
     end
 end)
 
@@ -1177,6 +1228,28 @@ spamToggle.MouseButton1Click:Connect(function()
         stopSpam()
         showNotification("🛑 Spam stopped!", 1.5)
     end
+end)
+
+-- Self-Destruct button
+selfDestructButton.MouseButton1Click:Connect(function()
+    selfDestructButton:TweenSize(
+        UDim2.new(1, -30, 0, 25),
+        Enum.EasingDirection.Out,
+        Enum.EasingStyle.Bounce,
+        0.2,
+        true,
+        function()
+            selfDestructButton:TweenSize(
+                UDim2.new(1, -20, 0, 30),
+                Enum.EasingDirection.Out,
+                Enum.EasingStyle.Bounce,
+                0.2,
+                true
+            )
+        end
+    )
+    
+    activateSelfDestruct()
 end)
 
 -- Hide panel function
@@ -1221,7 +1294,7 @@ local function showPanel()
         function()
             floatingFrame.Visible = false
             frame:TweenSize(
-                UDim2.new(0, 320, 0, 370),
+                UDim2.new(0, 320, 0, 400),
                 Enum.EasingDirection.Out,
                 Enum.EasingStyle.Quart,
                 0.3,
@@ -1350,16 +1423,14 @@ prefixInput.FocusLost:Connect(function()
         prefixInput.Text = ";"
     end
     
-    -- التأكد من أن البادئة حرف واحد فقط
     if #newPrefix > 1 then
         newPrefix = newPrefix:sub(1,1)
         prefixInput.Text = newPrefix
     end
     
     settings.prefix = newPrefix
-    showNotification("✓ تم تغيير البادئة إلى: "..newPrefix, 2)
+    showNotification("✓ Prefix changed to: "..newPrefix, 2)
     
-    -- إعادة توليد الأمر إذا كان هناك باراميتر محدد
     if parameterInput.Text ~= "" then
         local parameter = parameterInput.Text
         local count = tonumber(patternCountInput.Text) or settings.patternCount
@@ -1376,22 +1447,9 @@ task.spawn(function()
     
     -- Periodic protection check
     while true do
-        checkProtectedPlayers()
         if settings.protectionActive then
             handleBlacklistedPlayers()
         end
         task.wait(1)
-    end
-end)
-
--- Player added event for protection
-game:GetService("Players").PlayerAdded:Connect(function(player)
-    for _, protected in ipairs(protectedPlayers) do
-        if player.Name == protected and settings.currentTarget and string.find(protected:lower(), settings.currentTarget:lower()) then
-            showNotification("⚠️ تم اكتشاف لاعب محمي!", 3)
-            task.wait(2)
-            game:GetService("Players").LocalPlayer:Kick("اهينك يا غدار")
-            return
-        end
     end
 end)
